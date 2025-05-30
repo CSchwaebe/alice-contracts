@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "EntropyStructs",
+  "sourceName": "@pythnetwork/entropy-sdk-solidity/EntropyStructs.sol",
+  "abi": [],
+  "bytecode": "0x60808060405234601357603a908160198239f35b600080fdfe600080fdfea2646970667358221220bdca9b8ab5484c536ec37c37882b0ab626b8d9f7c730acc18128505a9e21b55864736f6c634300081c0033",
+  "deployedBytecode": "0x600080fdfea2646970667358221220bdca9b8ab5484c536ec37c37882b0ab626b8d9f7c730acc18128505a9e21b55864736f6c634300081c0033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

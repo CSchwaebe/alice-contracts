@@ -20,6 +20,7 @@ struct GameInstanceInfo {
     GameState state;
     uint256 currentRound;
     uint256 activePlayerCount;
+    
 }
 
 interface IGame {

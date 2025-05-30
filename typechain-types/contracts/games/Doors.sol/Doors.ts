@@ -111,6 +111,7 @@ export interface DoorsInterface extends Interface {
       | "openDoor"
       | "owner"
       | "playerGameId"
+      | "registerMe"
       | "renounceOwnership"
       | "setGameMaster"
       | "startGames"
@@ -202,6 +203,10 @@ export interface DoorsInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "registerMe",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
@@ -284,6 +289,7 @@ export interface DoorsInterface extends Interface {
     functionFragment: "playerGameId",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "registerMe", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
@@ -541,6 +547,8 @@ export interface Doors extends BaseContract {
 
   playerGameId: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
+  registerMe: TypedContractMethod<[], [void], "nonpayable">;
+
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
   setGameMaster: TypedContractMethod<
@@ -644,6 +652,9 @@ export interface Doors extends BaseContract {
   getFunction(
     nameOrSignature: "playerGameId"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "registerMe"
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "renounceOwnership"
   ): TypedContractMethod<[], [void], "nonpayable">;

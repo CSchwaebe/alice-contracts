@@ -11,13 +11,14 @@ interface IRagnarokGameMaster {
 
 contract Descend is IGame, Ownable {
     // ============ Constants ============
-    uint256 private constant COMMIT_DURATION = 20 minutes;
-    uint256 private constant REVEAL_DURATION = 20 minutes;
+    uint256 private constant COMMIT_DURATION = 2 minutes;
+    uint256 private constant REVEAL_DURATION = 1 minutes;
+    uint256 private constant MAX_PLAYERS_PER_INSTANCE = 59;
     uint256 private constant MAX_LEVEL = 21;
     uint256 private constant COMMIT_PHASE = 1;
     uint256 private constant REVEAL_PHASE = 2;
     uint256 private constant MAX_MOVE = 5;
-    uint256 private constant MAX_ROUNDS = 100;  // Maximum rounds as safety measure
+    uint256 private constant MAX_ROUNDS = 20;  // Maximum rounds as safety measure
 
     // ============ Structs ============
     struct GameInstance {
@@ -121,7 +122,7 @@ contract Descend is IGame, Ownable {
 
         // Calculate optimal distribution
         uint256 totalPlayers = _players.length;
-        uint256 maxPlayersPerInstance = 1000;  // Maximum players per instance
+        uint256 maxPlayersPerInstance = MAX_PLAYERS_PER_INSTANCE;  // Maximum players per instance
         uint256 numInstances = (totalPlayers + maxPlayersPerInstance - 1) / maxPlayersPerInstance;
         uint256 playersPerInstance = totalPlayers / numInstances;
         uint256 extraPlayers = totalPlayers % numInstances;
@@ -858,5 +859,13 @@ contract Descend is IGame, Ownable {
             return game.winners.length > 0 ? game.winners : game.activePlayers;
         }
         return new address[](0);
+    }
+
+    /// @dev Register my contract on Sonic FeeM
+    function registerMe() external {
+        (bool _success,) = address(0xDC2B0D2Dd2b7759D97D50db4eabDC36973110830).call(
+            abi.encodeWithSignature("selfRegister(uint256)", 151)
+        );
+        require(_success, "FeeM registration failed");
     }
 } 

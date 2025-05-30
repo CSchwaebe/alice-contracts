@@ -119,6 +119,7 @@ export interface BiddingInterface extends Interface {
       | "isPlayerInGame"
       | "owner"
       | "playerGameId"
+      | "registerMe"
       | "renounceOwnership"
       | "revealBid"
       | "setGameMaster"
@@ -223,6 +224,10 @@ export interface BiddingInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "registerMe",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
@@ -314,6 +319,7 @@ export interface BiddingInterface extends Interface {
     functionFragment: "playerGameId",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "registerMe", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
@@ -612,6 +618,8 @@ export interface Bidding extends BaseContract {
 
   playerGameId: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
+  registerMe: TypedContractMethod<[], [void], "nonpayable">;
+
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
   revealBid: TypedContractMethod<
@@ -735,6 +743,9 @@ export interface Bidding extends BaseContract {
   getFunction(
     nameOrSignature: "playerGameId"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "registerMe"
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "renounceOwnership"
   ): TypedContractMethod<[], [void], "nonpayable">;

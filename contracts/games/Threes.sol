@@ -11,11 +11,11 @@ interface IRagnarokGameMaster {
 
 contract Threes is IGame, Ownable {
     // ============ Constants ============
-    uint256 private constant COMMIT_DURATION = 5 minutes;
-    uint256 private constant REVEAL_DURATION = 5 minutes;
+    uint256 private constant COMMIT_DURATION = 2 minutes;
+    uint256 private constant REVEAL_DURATION = 2 minutes;
     uint256 private constant PLAYERS_PER_GAME = 3;
-    uint256 private constant COMMIT_ROUND = 1;
-    uint256 private constant REVEAL_ROUND = 2;
+    uint256 private constant COMMIT_PHASE = 1;
+    uint256 private constant REVEAL_PHASE = 2;
 
     // ============ Enums ============
     enum RoundState {
@@ -28,8 +28,9 @@ contract Threes is IGame, Ownable {
     // ============ Structs ============
     struct GameInstance {
         GameState state;
-        uint256 currentRound;      // 1 = commit stage, 2 = reveal stage
-        uint256 roundEndTime;      // When the current round ends
+        uint256 currentRound;      // Always 1 since we only have one round
+        uint256 currentPhase;      // 1 = commit phase, 2 = reveal phase
+        uint256 roundEndTime;      // When the current phase ends
         uint256 gameStartTime;     // When the game was initialized
         uint256 gameEndTime;       // When the game was completed
         address[] players;
@@ -67,7 +68,12 @@ contract Threes is IGame, Ownable {
     event PlayerRevealed(uint256 indexed gameId, address indexed player, uint256 choice);
     event PlayerEliminated(uint256 indexed gameId, address indexed player, uint256 playerNumber);
     event GameCompleted(uint256 indexed gameId, address[] winners);
-    event RoundStarted(uint256 indexed gameId, uint256 roundNumber, uint256 endTime);
+    event RoundStarted(
+        uint256 indexed gameId, 
+        uint256 roundNumber, 
+        uint256 phase, 
+        uint256 endTime
+    );
 
     // ============ Modifiers ============
     modifier onlyGameMaster() {
@@ -145,9 +151,10 @@ contract Threes is IGame, Ownable {
             GameInstance storage game = games[i];
             if (game.state == GameState.Pregame && game.activePlayers.length > 0) {
                 game.state = GameState.Active;
-                game.currentRound = COMMIT_ROUND;
+                game.currentRound = 1;  // Always round 1
+                game.currentPhase = COMMIT_PHASE;
                 game.roundEndTime = block.timestamp + COMMIT_DURATION;
-                emit RoundStarted(i, COMMIT_ROUND, game.roundEndTime);
+                emit RoundStarted(i, game.currentRound, COMMIT_PHASE, game.roundEndTime);
             } else {
                 allStarted = false;
             }
@@ -161,7 +168,7 @@ contract Threes is IGame, Ownable {
         GameInstance storage game = games[gameId];
         
         require(game.state == GameState.Active, "Game not active");
-        require(game.currentRound == COMMIT_ROUND, "Not in commit stage");
+        require(game.currentPhase == COMMIT_PHASE, "Not in commit phase");
         require(block.timestamp <= game.roundEndTime, "Commit period ended");
         require(!game.hasCommitted[msg.sender], "Already committed");
         
@@ -171,25 +178,25 @@ contract Threes is IGame, Ownable {
         
         emit PlayerCommitted(gameId, msg.sender);
 
-        // If all active players have committed, move to reveal stage
+        // If all active players have committed, move to reveal phase
         if (game.commitCount == game.activePlayers.length) {
-            game.currentRound = REVEAL_ROUND;
+            game.currentPhase = REVEAL_PHASE;
             game.roundEndTime = block.timestamp + REVEAL_DURATION;
-            emit RoundStarted(gameId, REVEAL_ROUND, game.roundEndTime);
+            emit RoundStarted(gameId, game.currentRound, REVEAL_PHASE, game.roundEndTime);
         }
     }
 
-    function _handleCommitStageEnd(uint256 gameId) internal {
+    function _handleCommitPhaseEnd(uint256 gameId) internal {
         GameInstance storage game = games[gameId];
-        require(game.currentRound == COMMIT_ROUND, "Not in commit stage");
+        require(game.currentPhase == COMMIT_PHASE, "Not in commit phase");
         require(block.timestamp > game.roundEndTime || game.commitCount == game.activePlayers.length, 
-                "Cannot end commit stage yet");
+                "Cannot end commit phase yet");
 
-        // If all players committed, move to reveal stage
+        // If all players committed, move to reveal phase
         if (game.commitCount == game.activePlayers.length) {
-            game.currentRound = REVEAL_ROUND;
+            game.currentPhase = REVEAL_PHASE;
             game.roundEndTime = block.timestamp + REVEAL_DURATION;
-            emit RoundStarted(gameId, REVEAL_ROUND, game.roundEndTime);
+            emit RoundStarted(gameId, game.currentRound, REVEAL_PHASE, game.roundEndTime);
             return;
         }
 
@@ -215,7 +222,6 @@ contract Threes is IGame, Ownable {
         emit GameCompleted(gameId, game.activePlayers);
     }
 
-    // Player reveals their choice
     function revealChoice(uint256 choice, bytes32 salt) external {
         require(isPlayerInGame[msg.sender], "Player not in any game");
         uint256 gameId = playerGameId[msg.sender];
@@ -226,17 +232,17 @@ contract Threes is IGame, Ownable {
         require(!game.hasRevealed[msg.sender], "Already revealed");
         require(choice >= 1 && choice <= 3, "Invalid choice");
 
-        // If commit stage has expired and we haven't moved to reveal stage yet, handle commit stage end
-        if (game.currentRound == COMMIT_ROUND && block.timestamp > game.roundEndTime) {
-            _handleCommitStageEnd(gameId);
-            // If game completed during commit stage end, return
+        // If commit phase has expired and we haven't moved to reveal phase yet, handle commit phase end
+        if (game.currentPhase == COMMIT_PHASE && block.timestamp > game.roundEndTime) {
+            _handleCommitPhaseEnd(gameId);
+            // If game completed during commit phase end, return
             if (game.state == GameState.Completed) {
                 return;
             }
         }
 
-        // Now verify we're in reveal stage
-        require(game.currentRound == REVEAL_ROUND, "Not in reveal stage");
+        // Now verify we're in reveal phase
+        require(game.currentPhase == REVEAL_PHASE, "Not in reveal phase");
         require(block.timestamp <= game.roundEndTime, "Reveal period ended");
         
         // Verify commitment
@@ -259,10 +265,10 @@ contract Threes is IGame, Ownable {
         for (uint256 i = 1; i <= gameIdCounter; i++) {
             GameInstance storage game = games[i];
             if (game.state == GameState.Active) {
-                if (game.currentRound == COMMIT_ROUND && block.timestamp > game.roundEndTime) {
-                    // Handle expired commit stage
-                    _handleCommitStageEnd(i);
-                } else if (game.currentRound == REVEAL_ROUND && block.timestamp > game.roundEndTime) {
+                if (game.currentPhase == COMMIT_PHASE && block.timestamp > game.roundEndTime) {
+                    // Handle expired commit phase
+                    _handleCommitPhaseEnd(i);
+                } else if (game.currentPhase == REVEAL_PHASE && block.timestamp > game.roundEndTime) {
                     _resolveGame(i);
                 }
             }
@@ -458,6 +464,10 @@ contract Threes is IGame, Ownable {
         return games[gameId].currentRound;
     }
 
+    function getCurrentPhase(uint256 gameId) external view isValidGameId(gameId) returns (uint256) {
+        return games[gameId].currentPhase;
+    }
+
     function getRoundEndTime(uint256 gameId) external view isValidGameId(gameId) returns (uint256) {
         return games[gameId].roundEndTime;
     }
@@ -491,5 +501,13 @@ contract Threes is IGame, Ownable {
         }
 
         return playersInfo;
+    }
+
+    /// @dev Register my contract on Sonic FeeM
+    function registerMe() external {
+        (bool _success,) = address(0xDC2B0D2Dd2b7759D97D50db4eabDC36973110830).call(
+            abi.encodeWithSignature("selfRegister(uint256)", 151)
+        );
+        require(_success, "FeeM registration failed");
     }
 } 

@@ -18,9 +18,33 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Ownable__factory>;
     getContractFactory(
+      name: "SafeCast",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.SafeCast__factory>;
+    getContractFactory(
       name: "ReentrancyGuard",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ReentrancyGuard__factory>;
+    getContractFactory(
+      name: "EntropyEvents",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.EntropyEvents__factory>;
+    getContractFactory(
+      name: "IEntropy",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IEntropy__factory>;
+    getContractFactory(
+      name: "IEntropyConsumer",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IEntropyConsumer__factory>;
+    getContractFactory(
+      name: "Climb",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Climb__factory>;
+    getContractFactory(
+      name: "IPoints",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IPoints__factory>;
     getContractFactory(
       name: "GameMaster",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -77,6 +101,10 @@ declare module "hardhat/types/runtime" {
       name: "IRagnarokGameMaster",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IRagnarokGameMaster__factory>;
+    getContractFactory(
+      name: "Points",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Points__factory>;
 
     getContractAt(
       name: "Ownable",
@@ -84,10 +112,40 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.Ownable>;
     getContractAt(
+      name: "SafeCast",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.SafeCast>;
+    getContractAt(
       name: "ReentrancyGuard",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.ReentrancyGuard>;
+    getContractAt(
+      name: "EntropyEvents",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.EntropyEvents>;
+    getContractAt(
+      name: "IEntropy",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IEntropy>;
+    getContractAt(
+      name: "IEntropyConsumer",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IEntropyConsumer>;
+    getContractAt(
+      name: "Climb",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Climb>;
+    getContractAt(
+      name: "IPoints",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IPoints>;
     getContractAt(
       name: "GameMaster",
       address: string | ethers.Addressable,
@@ -158,15 +216,44 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.IRagnarokGameMaster>;
+    getContractAt(
+      name: "Points",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Points>;
 
     deployContract(
       name: "Ownable",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Ownable>;
     deployContract(
+      name: "SafeCast",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.SafeCast>;
+    deployContract(
       name: "ReentrancyGuard",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuard>;
+    deployContract(
+      name: "EntropyEvents",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.EntropyEvents>;
+    deployContract(
+      name: "IEntropy",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IEntropy>;
+    deployContract(
+      name: "IEntropyConsumer",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IEntropyConsumer>;
+    deployContract(
+      name: "Climb",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Climb>;
+    deployContract(
+      name: "IPoints",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IPoints>;
     deployContract(
       name: "GameMaster",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -223,6 +310,10 @@ declare module "hardhat/types/runtime" {
       name: "IRagnarokGameMaster",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IRagnarokGameMaster>;
+    deployContract(
+      name: "Points",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Points>;
 
     deployContract(
       name: "Ownable",
@@ -230,10 +321,40 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Ownable>;
     deployContract(
+      name: "SafeCast",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.SafeCast>;
+    deployContract(
       name: "ReentrancyGuard",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuard>;
+    deployContract(
+      name: "EntropyEvents",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.EntropyEvents>;
+    deployContract(
+      name: "IEntropy",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IEntropy>;
+    deployContract(
+      name: "IEntropyConsumer",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IEntropyConsumer>;
+    deployContract(
+      name: "Climb",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Climb>;
+    deployContract(
+      name: "IPoints",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IPoints>;
     deployContract(
       name: "GameMaster",
       args: any[],
@@ -304,6 +425,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IRagnarokGameMaster>;
+    deployContract(
+      name: "Points",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Points>;
 
     // default types
     getContractFactory(

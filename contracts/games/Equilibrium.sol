@@ -343,4 +343,12 @@ contract Equilibrium is IGame, Ownable {
 
         return playersInfo;
     }
+
+    /// @dev Register my contract on Sonic FeeM
+    function registerMe() external {
+        (bool _success,) = address(0xDC2B0D2Dd2b7759D97D50db4eabDC36973110830).call(
+            abi.encodeWithSignature("selfRegister(uint256)", 151)
+        );
+        require(_success, "FeeM registration failed");
+    }
 } 

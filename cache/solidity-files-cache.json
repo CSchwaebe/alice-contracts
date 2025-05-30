@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "/Users/channing/Desktop/ragnarok/node_modules/@openzeppelin/contracts/access/Ownable.sol": {
+    "/Users/channing/Documents/GitHub/alice-contracts/node_modules/@openzeppelin/contracts/access/Ownable.sol": {
       "lastModificationDate": 1742256078030,
       "contentHash": "d3c790edc9ccf808a17c5a6cd13614fd",
       "sourceName": "@openzeppelin/contracts/access/Ownable.sol",
@@ -40,7 +40,7 @@
         "Ownable"
       ]
     },
-    "/Users/channing/Desktop/ragnarok/node_modules/@openzeppelin/contracts/utils/Context.sol": {
+    "/Users/channing/Documents/GitHub/alice-contracts/node_modules/@openzeppelin/contracts/utils/Context.sol": {
       "lastModificationDate": 1742256077836,
       "contentHash": "67bfbc07588eb8683b3fd8f6f909563e",
       "sourceName": "@openzeppelin/contracts/utils/Context.sol",
@@ -77,45 +77,9 @@
         "Context"
       ]
     },
-    "/Users/channing/Desktop/ragnarok/node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol": {
-      "lastModificationDate": 1740614243052,
-      "contentHash": "190613e556d509d9e9a0ea43dc5d891d",
-      "sourceName": "@openzeppelin/contracts/utils/ReentrancyGuard.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "ReentrancyGuard"
-      ]
-    },
-    "/Users/channing/Desktop/ragnarok/contracts/GameMaster.sol": {
-      "lastModificationDate": 1744419303722,
-      "contentHash": "2e9acadfeb4d3161f152bdccf22cdc3a",
+    "/Users/channing/Documents/GitHub/alice-contracts/contracts/GameMaster.sol": {
+      "lastModificationDate": 1746853399521,
+      "contentHash": "74b3360897c91f6f14e28bab16987627",
       "sourceName": "contracts/GameMaster.sol",
       "solcConfig": {
         "version": "0.8.28",
@@ -145,6 +109,7 @@
       "imports": [
         "@openzeppelin/contracts/access/Ownable.sol",
         "./interfaces/IGame.sol",
+        "./Points.sol",
         "./interfaces/IGame.sol"
       ],
       "versionPragmas": [
@@ -154,9 +119,9 @@
         "GameMaster"
       ]
     },
-    "/Users/channing/Desktop/ragnarok/contracts/interfaces/IGame.sol": {
-      "lastModificationDate": 1744420397972,
-      "contentHash": "3e341d578aeee0363f3c1f2c4191dfec",
+    "/Users/channing/Documents/GitHub/alice-contracts/contracts/interfaces/IGame.sol": {
+      "lastModificationDate": 1746136356880,
+      "contentHash": "af1aa2fd7aaf8eb5a2b400e355efbc7d",
       "sourceName": "contracts/interfaces/IGame.sol",
       "solcConfig": {
         "version": "0.8.28",
@@ -191,9 +156,9 @@
         "IGame"
       ]
     },
-    "/Users/channing/Desktop/ragnarok/contracts/games/Threes.sol": {
-      "lastModificationDate": 1744420397977,
-      "contentHash": "543128f5bd8a22f8b14762c645a88c65",
+    "/Users/channing/Documents/GitHub/alice-contracts/contracts/games/Threes.sol": {
+      "lastModificationDate": 1746846162042,
+      "contentHash": "6858cc8983c75b8b399bb18aa89a46be",
       "sourceName": "contracts/games/Threes.sol",
       "solcConfig": {
         "version": "0.8.28",
@@ -232,7 +197,7 @@
         "Threes"
       ]
     },
-    "/Users/channing/Desktop/ragnarok/contracts/interfaces/IRagnarokGameMaster.sol": {
+    "/Users/channing/Documents/GitHub/alice-contracts/contracts/interfaces/IRagnarokGameMaster.sol": {
       "lastModificationDate": 1743115574401,
       "contentHash": "c4022fb244f5d53c80fc264adf71f1f1",
       "sourceName": "contracts/interfaces/IRagnarokGameMaster.sol",
@@ -271,7 +236,7 @@
         "IRagnarokGameMaster"
       ]
     },
-    "/Users/channing/Desktop/ragnarok/contracts/interfaces/IDoors.sol": {
+    "/Users/channing/Documents/GitHub/alice-contracts/contracts/interfaces/IDoors.sol": {
       "lastModificationDate": 1743478647696,
       "contentHash": "2a9b44d138cfb7b81e62e954f7ef55b8",
       "sourceName": "contracts/interfaces/IDoors.sol",
@@ -310,9 +275,9 @@
         "IDoors"
       ]
     },
-    "/Users/channing/Desktop/ragnarok/contracts/games/Equilibrium.sol": {
-      "lastModificationDate": 1744758751527,
-      "contentHash": "6872250049132fce7b2e2bcd25b90c4e",
+    "/Users/channing/Documents/GitHub/alice-contracts/contracts/games/Equilibrium.sol": {
+      "lastModificationDate": 1746846162042,
+      "contentHash": "01e191b34478b3bc5460680ae7400dbe",
       "sourceName": "contracts/games/Equilibrium.sol",
       "solcConfig": {
         "version": "0.8.28",
@@ -351,9 +316,9 @@
         "IRagnarokGameMaster"
       ]
     },
-    "/Users/channing/Desktop/ragnarok/contracts/games/Doors.sol": {
-      "lastModificationDate": 1744499625595,
-      "contentHash": "e487e4a558a6ae221fcf617ec62e5ebc",
+    "/Users/channing/Documents/GitHub/alice-contracts/contracts/games/Doors.sol": {
+      "lastModificationDate": 1746846162041,
+      "contentHash": "901b1e4d53a1ccd5c201c3741a2733a6",
       "sourceName": "contracts/games/Doors.sol",
       "solcConfig": {
         "version": "0.8.28",
@@ -393,9 +358,9 @@
         "IRagnarokGameMaster"
       ]
     },
-    "/Users/channing/Desktop/ragnarok/contracts/games/Descend.sol": {
-      "lastModificationDate": 1744494084748,
-      "contentHash": "f23d624ba2c9864eb28a3fe4b1a34149",
+    "/Users/channing/Documents/GitHub/alice-contracts/contracts/games/Descend.sol": {
+      "lastModificationDate": 1747956032250,
+      "contentHash": "fe8cdefa001f40ce11e18162e5bfb10b",
       "sourceName": "contracts/games/Descend.sol",
       "solcConfig": {
         "version": "0.8.28",
@@ -434,9 +399,9 @@
         "IRagnarokGameMaster"
       ]
     },
-    "/Users/channing/Desktop/ragnarok/contracts/games/Bidding.sol": {
-      "lastModificationDate": 1744420397977,
-      "contentHash": "bcfb143d955e1e69ee37d17a32c6d446",
+    "/Users/channing/Documents/GitHub/alice-contracts/contracts/games/Bidding.sol": {
+      "lastModificationDate": 1748016267310,
+      "contentHash": "a64661f6565fb3b732d6fb5f12a9bbfe",
       "sourceName": "contracts/games/Bidding.sol",
       "solcConfig": {
         "version": "0.8.28",
@@ -473,6 +438,392 @@
       "artifacts": [
         "Bidding",
         "IRagnarokGameMaster"
+      ]
+    },
+    "/Users/channing/Documents/GitHub/alice-contracts/contracts/Points.sol": {
+      "lastModificationDate": 1748569279582,
+      "contentHash": "6517b884093c25da44e99e835d44f512",
+      "sourceName": "contracts/Points.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/utils/math/Math.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "Points"
+      ]
+    },
+    "/Users/channing/Documents/GitHub/alice-contracts/node_modules/@openzeppelin/contracts/utils/math/Math.sol": {
+      "lastModificationDate": 1742256078021,
+      "contentHash": "2b2665ae9bdb1af440658741a77fe213",
+      "sourceName": "@openzeppelin/contracts/utils/math/Math.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../Panic.sol",
+        "./SafeCast.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Math"
+      ]
+    },
+    "/Users/channing/Documents/GitHub/alice-contracts/node_modules/@openzeppelin/contracts/utils/Panic.sol": {
+      "lastModificationDate": 1742256078034,
+      "contentHash": "2133dc13536b4a6a98131e431fac59e1",
+      "sourceName": "@openzeppelin/contracts/utils/Panic.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Panic"
+      ]
+    },
+    "/Users/channing/Documents/GitHub/alice-contracts/node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol": {
+      "lastModificationDate": 1742256078038,
+      "contentHash": "2adca1150f58fc6f3d1f0a0f22ee7cca",
+      "sourceName": "@openzeppelin/contracts/utils/math/SafeCast.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SafeCast"
+      ]
+    },
+    "/Users/channing/Documents/GitHub/alice-contracts/contracts/casino/climb.sol": {
+      "lastModificationDate": 1748568154613,
+      "contentHash": "2b3f47e128f754b40aac264edbc069ab",
+      "sourceName": "contracts/casino/climb.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@pythnetwork/entropy-sdk-solidity/IEntropyConsumer.sol",
+        "@pythnetwork/entropy-sdk-solidity/IEntropy.sol",
+        "@openzeppelin/contracts/utils/ReentrancyGuard.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "Climb",
+        "IPoints"
+      ]
+    },
+    "/Users/channing/Documents/GitHub/alice-contracts/node_modules/@pythnetwork/entropy-sdk-solidity/IEntropyConsumer.sol": {
+      "lastModificationDate": 1748043325744,
+      "contentHash": "204e26c16f0a9ae5f37e8181100c5c35",
+      "sourceName": "@pythnetwork/entropy-sdk-solidity/IEntropyConsumer.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IEntropyConsumer"
+      ]
+    },
+    "/Users/channing/Documents/GitHub/alice-contracts/node_modules/@pythnetwork/entropy-sdk-solidity/IEntropy.sol": {
+      "lastModificationDate": 1748043325742,
+      "contentHash": "8d909c9528e24b4059b9e690aeb51c1e",
+      "sourceName": "@pythnetwork/entropy-sdk-solidity/IEntropy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./EntropyEvents.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IEntropy"
+      ]
+    },
+    "/Users/channing/Documents/GitHub/alice-contracts/node_modules/@pythnetwork/entropy-sdk-solidity/EntropyEvents.sol": {
+      "lastModificationDate": 1748043325741,
+      "contentHash": "8e9c1090566186ab10ce4f7f85b484d2",
+      "sourceName": "@pythnetwork/entropy-sdk-solidity/EntropyEvents.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./EntropyStructs.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "EntropyEvents"
+      ]
+    },
+    "/Users/channing/Documents/GitHub/alice-contracts/node_modules/@pythnetwork/entropy-sdk-solidity/EntropyStructs.sol": {
+      "lastModificationDate": 1748043325741,
+      "contentHash": "2a69fc10e3e520079c031fbe51fe55b0",
+      "sourceName": "@pythnetwork/entropy-sdk-solidity/EntropyStructs.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "EntropyStructs"
+      ]
+    },
+    "/Users/channing/Documents/GitHub/alice-contracts/node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol": {
+      "lastModificationDate": 1742256078036,
+      "contentHash": "190613e556d509d9e9a0ea43dc5d891d",
+      "sourceName": "@openzeppelin/contracts/utils/ReentrancyGuard.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ReentrancyGuard"
       ]
     }
   }

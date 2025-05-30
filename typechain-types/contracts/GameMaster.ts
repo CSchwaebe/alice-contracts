@@ -45,7 +45,6 @@ export type GameInstanceInfoStructOutput = [
 export interface GameMasterInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "MAX_PLAYERS"
       | "activePlayers"
       | "closeRegistration"
       | "eliminatedPlayers"
@@ -69,19 +68,27 @@ export interface GameMasterInterface extends Interface {
       | "isActivePlayer"
       | "isGameRegistered"
       | "isRegistered"
+      | "maxPlayers"
       | "owner"
       | "playerEliminated"
       | "playerNumbers"
+      | "pointsContract"
       | "register"
       | "registerGame"
+      | "registerMe"
+      | "registerPlayersBatch"
+      | "registerWithReferral"
       | "registeredGames"
       | "registeredPlayers"
       | "registrationClosed"
       | "registrationFee"
       | "renounceOwnership"
       | "resetGame"
+      | "setMaxPlayers"
+      | "setPointsContract"
       | "setRegistrationFee"
       | "startGames"
+      | "toggleRegistration"
       | "transferOwnership"
       | "withdraw"
   ): FunctionFragment;
@@ -102,10 +109,6 @@ export interface GameMasterInterface extends Interface {
       | "RegistrationFeeChanged"
   ): EventFragment;
 
-  encodeFunctionData(
-    functionFragment: "MAX_PLAYERS",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "activePlayers",
     values: [BigNumberish]
@@ -192,6 +195,10 @@ export interface GameMasterInterface extends Interface {
     functionFragment: "isRegistered",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(
+    functionFragment: "maxPlayers",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "playerEliminated",
@@ -201,10 +208,26 @@ export interface GameMasterInterface extends Interface {
     functionFragment: "playerNumbers",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(
+    functionFragment: "pointsContract",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "register", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "registerGame",
     values: [string, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "registerMe",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "registerPlayersBatch",
+    values: [AddressLike[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "registerWithReferral",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "registeredGames",
@@ -228,20 +251,28 @@ export interface GameMasterInterface extends Interface {
   ): string;
   encodeFunctionData(functionFragment: "resetGame", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "setMaxPlayers",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setPointsContract",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setRegistrationFee",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "startGames", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "toggleRegistration",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
-  decodeFunctionResult(
-    functionFragment: "MAX_PLAYERS",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "activePlayers",
     data: BytesLike
@@ -328,6 +359,7 @@ export interface GameMasterInterface extends Interface {
     functionFragment: "isRegistered",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "maxPlayers", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "playerEliminated",
@@ -337,9 +369,22 @@ export interface GameMasterInterface extends Interface {
     functionFragment: "playerNumbers",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "pointsContract",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "register", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "registerGame",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "registerMe", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "registerPlayersBatch",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "registerWithReferral",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -364,10 +409,22 @@ export interface GameMasterInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "resetGame", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "setMaxPlayers",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setPointsContract",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setRegistrationFee",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "startGames", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "toggleRegistration",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
@@ -575,8 +632,6 @@ export interface GameMaster extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  MAX_PLAYERS: TypedContractMethod<[], [bigint], "view">;
-
   activePlayers: TypedContractMethod<[arg0: BigNumberish], [string], "view">;
 
   closeRegistration: TypedContractMethod<[], [void], "nonpayable">;
@@ -664,6 +719,8 @@ export interface GameMaster extends BaseContract {
 
   isRegistered: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
 
+  maxPlayers: TypedContractMethod<[], [bigint], "view">;
+
   owner: TypedContractMethod<[], [string], "view">;
 
   playerEliminated: TypedContractMethod<
@@ -674,12 +731,28 @@ export interface GameMaster extends BaseContract {
 
   playerNumbers: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
+  pointsContract: TypedContractMethod<[], [string], "view">;
+
   register: TypedContractMethod<[], [void], "payable">;
 
   registerGame: TypedContractMethod<
     [gameName: string, gameAddress: AddressLike],
     [void],
     "nonpayable"
+  >;
+
+  registerMe: TypedContractMethod<[], [void], "nonpayable">;
+
+  registerPlayersBatch: TypedContractMethod<
+    [players: AddressLike[]],
+    [void],
+    "nonpayable"
+  >;
+
+  registerWithReferral: TypedContractMethod<
+    [referralCode: string],
+    [void],
+    "payable"
   >;
 
   registeredGames: TypedContractMethod<[arg0: BigNumberish], [string], "view">;
@@ -698,6 +771,18 @@ export interface GameMaster extends BaseContract {
 
   resetGame: TypedContractMethod<[], [void], "nonpayable">;
 
+  setMaxPlayers: TypedContractMethod<
+    [_maxPlayers: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  setPointsContract: TypedContractMethod<
+    [_pointsContract: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
   setRegistrationFee: TypedContractMethod<
     [_newFee: BigNumberish],
     [void],
@@ -706,21 +791,20 @@ export interface GameMaster extends BaseContract {
 
   startGames: TypedContractMethod<[gameName: string], [boolean], "nonpayable">;
 
+  toggleRegistration: TypedContractMethod<[], [void], "nonpayable">;
+
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
     [void],
     "nonpayable"
   >;
 
-  withdraw: TypedContractMethod<[], [void], "nonpayable">;
+  withdraw: TypedContractMethod<[], [boolean], "nonpayable">;
 
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
 
-  getFunction(
-    nameOrSignature: "MAX_PLAYERS"
-  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "activePlayers"
   ): TypedContractMethod<[arg0: BigNumberish], [string], "view">;
@@ -816,6 +900,9 @@ export interface GameMaster extends BaseContract {
     nameOrSignature: "isRegistered"
   ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
   getFunction(
+    nameOrSignature: "maxPlayers"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
@@ -824,6 +911,9 @@ export interface GameMaster extends BaseContract {
   getFunction(
     nameOrSignature: "playerNumbers"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "pointsContract"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "register"
   ): TypedContractMethod<[], [void], "payable">;
@@ -834,6 +924,15 @@ export interface GameMaster extends BaseContract {
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "registerMe"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "registerPlayersBatch"
+  ): TypedContractMethod<[players: AddressLike[]], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "registerWithReferral"
+  ): TypedContractMethod<[referralCode: string], [void], "payable">;
   getFunction(
     nameOrSignature: "registeredGames"
   ): TypedContractMethod<[arg0: BigNumberish], [string], "view">;
@@ -853,17 +952,26 @@ export interface GameMaster extends BaseContract {
     nameOrSignature: "resetGame"
   ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
+    nameOrSignature: "setMaxPlayers"
+  ): TypedContractMethod<[_maxPlayers: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setPointsContract"
+  ): TypedContractMethod<[_pointsContract: AddressLike], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "setRegistrationFee"
   ): TypedContractMethod<[_newFee: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "startGames"
   ): TypedContractMethod<[gameName: string], [boolean], "nonpayable">;
   getFunction(
+    nameOrSignature: "toggleRegistration"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "withdraw"
-  ): TypedContractMethod<[], [void], "nonpayable">;
+  ): TypedContractMethod<[], [boolean], "nonpayable">;
 
   getEvent(
     key: "GameRegistered"

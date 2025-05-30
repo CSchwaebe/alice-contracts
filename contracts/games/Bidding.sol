@@ -11,12 +11,13 @@ interface IRagnarokGameMaster {
 
 contract Bidding is IGame, Ownable {
     // ============ Constants ============
-    uint256 private constant INITIAL_POINTS = 100;
+    uint256 private constant INITIAL_POINTS = 1000;
     uint256 private constant COMMIT_DURATION = 2 minutes;
-    uint256 private constant REVEAL_DURATION = 2 minutes;
-    uint256 private constant MAX_ROUNDS = 10;
+    uint256 private constant REVEAL_DURATION = 1 minutes;
+    uint256 private constant MAX_ROUNDS = 20;
     uint256 private constant COMMIT_PHASE = 1;
     uint256 private constant REVEAL_PHASE = 2;
+    uint256 private constant MAX_PLAYERS_PER_INSTANCE = 20;
 
     // ============ Enums ============
     enum RoundState {
@@ -108,8 +109,7 @@ contract Bidding is IGame, Ownable {
 
         // Calculate optimal distribution
         uint256 totalPlayers = _players.length;
-        uint256 maxPlayersPerInstance = 10;  // Maximum players per instance
-        uint256 numInstances = (totalPlayers + maxPlayersPerInstance - 1) / maxPlayersPerInstance;
+        uint256 numInstances = (totalPlayers + MAX_PLAYERS_PER_INSTANCE - 1) / MAX_PLAYERS_PER_INSTANCE;
         uint256 playersPerInstance = totalPlayers / numInstances;
         uint256 extraPlayers = totalPlayers % numInstances;
 
@@ -301,37 +301,140 @@ contract Bidding is IGame, Ownable {
         }
     }
 
-    function _resolveRound(uint256 gameId) internal {
+    // Internal function to get players who haven't revealed their bids
+    function _getUnrevealedPlayers(uint256 gameId) internal view returns (address[] memory, uint256) {
         GameInstance storage game = games[gameId];
-        
-        // First eliminate players who didn't reveal
         address[] memory playersToEliminate = new address[](game.activePlayers.length);
         uint256 eliminationCount = 0;
         
-        // Mark players who didn't reveal
         for (uint256 i = 0; i < game.activePlayers.length; i++) {
             address player = game.activePlayers[i];
             if (!game.hasRevealed[player]) {
                 playersToEliminate[eliminationCount++] = player;
             }
         }
+        
+        return (playersToEliminate, eliminationCount);
+    }
 
-        // Eliminate non-revealing players
-        for (uint256 i = 0; i < eliminationCount; i++) {
-            _eliminatePlayer(gameId, playersToEliminate[i]);
+    // Internal function to deduct points and find lowest bid
+    function _deductPointsAndFindLowestBid(uint256 gameId) internal returns (uint256) {
+        GameInstance storage game = games[gameId];
+        uint256 lowestBid = type(uint256).max;
+        
+        // Create array to track players to eliminate
+        address[] memory insufficientPointsPlayers = new address[](game.activePlayers.length);
+        uint256 eliminationCount = 0;
+
+        // First pass: check points and track eliminations
+        for (uint256 i = 0; i < game.activePlayers.length; i++) {
+            address player = game.activePlayers[i];
+            if (game.hasRevealed[player]) {
+                uint256 bid = game.reveals[player];
+                uint256 currentPoints = game.playerPoints[player];
+                
+                // Check if player has enough points
+                if (bid > currentPoints) {
+                    insufficientPointsPlayers[eliminationCount++] = player;
+                } else {
+                    // Only track valid bids for lowest bid calculation
+                    if (bid < lowestBid) {
+                        lowestBid = bid;
+                    }
+                    // Deduct points for valid bids
+                    game.playerPoints[player] -= bid;
+                    emit PointsDeducted(gameId, player, bid, game.playerPoints[player]);
+                }
+            }
         }
 
-        // Check if game should end
-        if (game.activePlayers.length < 2 || game.currentRound >= MAX_ROUNDS) {
-            game.state = GameState.Completed;
-            game.gameEndTime = block.timestamp;  // Set end time when game completes
-            emit GameCompleted(gameId, game.activePlayers);
+        // Eliminate players with insufficient points
+        for (uint256 i = 0; i < eliminationCount; i++) {
+            _eliminatePlayer(gameId, insufficientPointsPlayers[i]);
+        }
+        
+        return lowestBid;
+    }
+
+    // Internal function to get players who tied for lowest bid
+    function _getPlayersWithLowestBid(uint256 gameId, uint256 lowestBid) internal view returns (address[] memory, uint256) {
+        GameInstance storage game = games[gameId];
+        address[] memory playersToEliminate = new address[](game.activePlayers.length);
+        uint256 eliminationCount = 0;
+        
+        for (uint256 i = 0; i < game.activePlayers.length; i++) {
+            address player = game.activePlayers[i];
+            if (game.hasRevealed[player] && game.reveals[player] == lowestBid) {
+                playersToEliminate[eliminationCount++] = player;
+            }
+        }
+        
+        return (playersToEliminate, eliminationCount);
+    }
+
+    // Internal function to check if game should end
+    function _shouldEndGame(uint256 gameId) internal view returns (bool) {
+        GameInstance storage game = games[gameId];
+        return game.activePlayers.length < 2 || game.currentRound >= MAX_ROUNDS;
+    }
+
+    // Internal function to end the game
+    function _endGame(uint256 gameId) internal {
+        GameInstance storage game = games[gameId];
+        game.state = GameState.Completed;
+        game.gameEndTime = block.timestamp;
+        emit GameCompleted(gameId, game.activePlayers);
+    }
+
+    // Internal function to start the next round
+    function _startNextRound(uint256 gameId) internal {
+        GameInstance storage game = games[gameId];
+        game.currentRound++;
+        game.currentPhase = COMMIT_PHASE;
+        game.roundEndTime = block.timestamp + COMMIT_DURATION;
+        
+        // Reset round-specific counters
+        game.commitCount = 0;
+        game.revealCount = 0;
+        
+        // Reset all player-specific round state
+        for (uint256 i = 0; i < game.activePlayers.length; i++) {
+            address player = game.activePlayers[i];
+            game.hasCommitted[player] = false;
+            game.hasRevealed[player] = false;
+            game.commitments[player] = bytes32(0);
+            game.reveals[player] = 0;
+        }
+        
+        emit RoundStarted(gameId, game.currentRound, COMMIT_PHASE, game.roundEndTime);
+    }
+
+    function _resolveRound(uint256 gameId) internal {
+        GameInstance storage game = games[gameId];
+        
+        // Get and eliminate players who didn't reveal
+        (address[] memory unrevealedPlayers, uint256 unrevealedCount) = _getUnrevealedPlayers(gameId);
+        for (uint256 i = 0; i < unrevealedCount; i++) {
+            _eliminatePlayer(gameId, unrevealedPlayers[i]);
+        }
+
+        // If we have active players who revealed, handle bids
+        if (game.activePlayers.length > 0) {
+            // Deduct points and find lowest bid
+            uint256 lowestBid = _deductPointsAndFindLowestBid(gameId);
+            
+            // Get and eliminate players with lowest bid
+            (address[] memory lowestBidders, uint256 lowestBiddersCount) = _getPlayersWithLowestBid(gameId, lowestBid);
+            for (uint256 i = 0; i < lowestBiddersCount; i++) {
+                _eliminatePlayer(gameId, lowestBidders[i]);
+            }
+        }
+
+        // Either end game or start next round
+        if (_shouldEndGame(gameId)) {
+            _endGame(gameId);
         } else {
-            // Start next round
-            game.currentRound++;
-            game.currentPhase = COMMIT_PHASE;
-            game.roundEndTime = block.timestamp + COMMIT_DURATION;
-            emit RoundStarted(gameId, game.currentRound, COMMIT_PHASE, game.roundEndTime);
+            _startNextRound(gameId);
         }
     }
 
@@ -482,5 +585,13 @@ contract Bidding is IGame, Ownable {
         }
 
         return playersInfo;
+    }
+
+    /// @dev Register my contract on Sonic FeeM
+    function registerMe() external {
+        (bool _success,) = address(0xDC2B0D2Dd2b7759D97D50db4eabDC36973110830).call(
+            abi.encodeWithSignature("selfRegister(uint256)", 151)
+        );
+        require(_success, "FeeM registration failed");
     }
 } 

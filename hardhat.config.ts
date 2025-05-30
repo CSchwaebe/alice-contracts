@@ -14,7 +14,7 @@ const config: HardhatUserConfig = {
       chainId: 31337,
       accounts: {
         count: 1001,  // 1000 players + 1 owner
-        accountsBalance: ethers.parseEther("100000").toString(),  // Increased to 100,000 ETH
+        accountsBalance: ethers.parseEther("10000000").toString(),  // Increased to 10,000,000 ETH
       },
       blockGasLimit: 4000000000000 
     },

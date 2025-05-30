@@ -99,6 +99,7 @@ export interface ThreesInterface extends Interface {
       | "gameIdCounter"
       | "gameMaster"
       | "getActivePlayers"
+      | "getCurrentPhase"
       | "getCurrentRound"
       | "getGameInfo"
       | "getGameName"
@@ -115,6 +116,7 @@ export interface ThreesInterface extends Interface {
       | "isPlayerInGame"
       | "owner"
       | "playerGameId"
+      | "registerMe"
       | "renounceOwnership"
       | "revealChoice"
       | "setGameMaster"
@@ -154,6 +156,10 @@ export interface ThreesInterface extends Interface {
   encodeFunctionData(
     functionFragment: "getActivePlayers",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getCurrentPhase",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getCurrentRound",
@@ -214,6 +220,10 @@ export interface ThreesInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "registerMe",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
@@ -250,6 +260,10 @@ export interface ThreesInterface extends Interface {
   decodeFunctionResult(functionFragment: "gameMaster", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getActivePlayers",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getCurrentPhase",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -304,6 +318,7 @@ export interface ThreesInterface extends Interface {
     functionFragment: "playerGameId",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "registerMe", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
@@ -434,16 +449,19 @@ export namespace RoundStartedEvent {
   export type InputTuple = [
     gameId: BigNumberish,
     roundNumber: BigNumberish,
+    phase: BigNumberish,
     endTime: BigNumberish
   ];
   export type OutputTuple = [
     gameId: bigint,
     roundNumber: bigint,
+    phase: bigint,
     endTime: bigint
   ];
   export interface OutputObject {
     gameId: bigint;
     roundNumber: bigint;
+    phase: bigint;
     endTime: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
@@ -511,6 +529,12 @@ export interface Threes extends BaseContract {
 
   getActivePlayers: TypedContractMethod<[], [string[]], "view">;
 
+  getCurrentPhase: TypedContractMethod<
+    [gameId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
   getCurrentRound: TypedContractMethod<
     [gameId: BigNumberish],
     [bigint],
@@ -575,6 +599,8 @@ export interface Threes extends BaseContract {
 
   playerGameId: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
+  registerMe: TypedContractMethod<[], [void], "nonpayable">;
+
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
   revealChoice: TypedContractMethod<
@@ -619,6 +645,9 @@ export interface Threes extends BaseContract {
   getFunction(
     nameOrSignature: "getActivePlayers"
   ): TypedContractMethod<[], [string[]], "view">;
+  getFunction(
+    nameOrSignature: "getCurrentPhase"
+  ): TypedContractMethod<[gameId: BigNumberish], [bigint], "view">;
   getFunction(
     nameOrSignature: "getCurrentRound"
   ): TypedContractMethod<[gameId: BigNumberish], [bigint], "view">;
@@ -691,6 +720,9 @@ export interface Threes extends BaseContract {
   getFunction(
     nameOrSignature: "playerGameId"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "registerMe"
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "renounceOwnership"
   ): TypedContractMethod<[], [void], "nonpayable">;
@@ -846,7 +878,7 @@ export interface Threes extends BaseContract {
       PlayerRevealedEvent.OutputObject
     >;
 
-    "RoundStarted(uint256,uint256,uint256)": TypedContractEvent<
+    "RoundStarted(uint256,uint256,uint256,uint256)": TypedContractEvent<
       RoundStartedEvent.InputTuple,
       RoundStartedEvent.OutputTuple,
       RoundStartedEvent.OutputObject

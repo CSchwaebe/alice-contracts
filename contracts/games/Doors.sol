@@ -16,7 +16,7 @@ contract Doors is IGame, Ownable {
     // ============ Constants ============
     uint256 private constant INITIAL_ROUND_DURATION = 2 minutes;
     uint256 private constant DURATION_DECREASE_PER_ROUND = 6 seconds;
-    uint256 private constant MAX_ROUNDS = 2;
+    uint256 private constant MAX_ROUNDS = 10;
     uint256 private constant TARGET_PLAYERS = 20;
     uint256 private constant FINAL_ROUND_DURATION = 1 minutes;
 
@@ -33,6 +33,7 @@ contract Doors is IGame, Ownable {
         address[] activePlayers;
         mapping(address => bool) isActivePlayer;
         mapping(address => uint256) totalDoorsOpened;
+        mapping(address => uint256) activePlayerIndices;  // For efficient removal
     }
 
     struct PlayerInfo {
@@ -91,7 +92,6 @@ contract Doors is IGame, Ownable {
             "Array lengths must match"
         );
 
-        // Calculate optimal distribution
         uint256 totalPlayers = _players.length;
         uint256 numInstances = (totalPlayers + TARGET_PLAYERS - 1) /
             TARGET_PLAYERS;
@@ -100,22 +100,19 @@ contract Doors is IGame, Ownable {
 
         uint256 playerIndex = 0;
 
-        // Create game instances starting from ID 1
         for (uint256 i = 0; i < numInstances; i++) {
-            uint256 gameId = ++gameIdCounter; // Increment first, then use
+            uint256 gameId = ++gameIdCounter;
             GameInstance storage game = games[gameId];
 
             game.state = GameState.Pregame;
             game.currentRound = 0;
-            game.gameStartTime = block.timestamp;  // Set start time on initialization
+            game.gameStartTime = block.timestamp;
 
-            // Calculate players for this instance
             uint256 instancePlayers = playersPerInstance;
             if (i < extraPlayers) {
                 instancePlayers += 1;
             }
 
-            // Add players to this instance
             for (uint256 j = 0; j < instancePlayers; j++) {
                 address player = _players[playerIndex];
                 require(player != address(0), "Invalid player address");
@@ -125,9 +122,9 @@ contract Doors is IGame, Ownable {
                 game.isPlayer[player] = true;
                 game.activePlayers.push(player);
                 game.isActivePlayer[player] = true;
+                game.activePlayerIndices[player] = j;  // NEW: Store the index
                 playerIndex++;
 
-                // Track player's game
                 playerGameId[player] = gameId;
                 isPlayerInGame[player] = true;
             }
@@ -176,22 +173,20 @@ contract Doors is IGame, Ownable {
     }
 
     function openDoor() external returns (bool) {
-        require(isPlayerInGame[msg.sender], "Player not in any game");
+        require(isPlayerInGame[msg.sender], "Player not in game");
         uint256 gameId = playerGameId[msg.sender];
 
         GameInstance storage game = games[gameId];
         require(game.state == GameState.Active, "Game not active");
         require(game.isActivePlayer[msg.sender], "Not an active player");
         
-        // Check if round has expired
         if (block.timestamp > game.roundEndTime) {
             _handleExpiredRound(gameId);
             return false;
         }
 
-        // Normal door opening logic continues here
         game.totalDoorsOpened[msg.sender]++;
-
+        
         uint256 randomValue = uint256(
             keccak256(
                 abi.encodePacked(
@@ -205,35 +200,32 @@ contract Doors is IGame, Ownable {
             )
         );
         bool success = randomValue % 2 == 0;
-
+        
         emit DoorOpened(gameId, msg.sender, success);
 
         if (!success) {
-            eliminatePlayer(gameId, msg.sender);
-            _endAndCheckFinalRound(gameId);
-            return false;
-        }
-
-        // Add dummy operations to equalize gas with failure path
-        {
-            // Dummy storage writes to match eliminatePlayer storage operations
-            bool dummy1 = game.isActivePlayer[msg.sender];
-            game.isActivePlayer[msg.sender] = dummy1;
-            bool dummy2 = isPlayerInGame[msg.sender];
-            isPlayerInGame[msg.sender] = dummy2;
+            // Remove player efficiently using stored index
+            game.isActivePlayer[msg.sender] = false;
+            isPlayerInGame[msg.sender] = false;
             
-            // Dummy array operation to match array manipulation in eliminatePlayer
-            uint256 len = game.activePlayers.length;
-            address dummyAddr = game.activePlayers[len - 1];
-            game.activePlayers[len - 1] = dummyAddr;
+            uint256 playerIndex = game.activePlayerIndices[msg.sender];
+            uint256 lastIndex = game.activePlayers.length - 1;
             
-            // Dummy external call to match gameMaster call
-            try IRagnarokGameMaster(gameMaster).playerEliminated(address(0)) {
+            if (playerIndex != lastIndex) {
+                address lastPlayer = game.activePlayers[lastIndex];
+                game.activePlayers[playerIndex] = lastPlayer;
+                game.activePlayerIndices[lastPlayer] = playerIndex;
+            }
+            game.activePlayers.pop();
+            
+            emit PlayerEliminated(gameId, msg.sender, game.playerNumbers[msg.sender]);
+            
+            try IRagnarokGameMaster(gameMaster).playerEliminated(msg.sender) {
             } catch {}
         }
 
         _endAndCheckFinalRound(gameId);
-        return true;
+        return success;
     }
 
     function endExpiredGames() external override onlyGameMaster {
@@ -536,4 +528,11 @@ contract Doors is IGame, Ownable {
         return allActivePlayers;
     }
 
+    /// @dev Register my contract on Sonic FeeM
+    function registerMe() external {
+        (bool _success,) = address(0xDC2B0D2Dd2b7759D97D50db4eabDC36973110830).call(
+            abi.encodeWithSignature("selfRegister(uint256)", 151)
+        );
+        require(_success, "FeeM registration failed");
+    }
 }

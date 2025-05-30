@@ -3,6 +3,7 @@ pragma solidity ^0.8.28;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IGame.sol";
+import "./Points.sol";
 
 // Import GameState enum from IGame
 import {GameState} from "./interfaces/IGame.sol";
@@ -15,7 +16,8 @@ contract GameMaster is Ownable {
     // =============================================================
     // ==================== Constants ==============================
     // =============================================================
-    uint256 public constant MAX_PLAYERS = 1000;
+    uint256 public maxPlayers = 1000;
+    Points public pointsContract;
 
     // =============================================================
     // ================== Player Registration ======================
@@ -23,7 +25,7 @@ contract GameMaster is Ownable {
     address[] public registeredPlayers;
     mapping(address => bool) public isRegistered;
     bool public registrationClosed;
-    uint256 public registrationFee = 0.1 ether;
+    uint256 public registrationFee = 12 ether;
     
     // =============================================================
     // ================== Active Player Tracking ==================
@@ -65,6 +67,15 @@ contract GameMaster is Ownable {
     
     constructor() Ownable(msg.sender) {}
     
+    /**
+     * @notice Sets the Points contract address
+     * @param _pointsContract Address of the Points contract
+     */
+    function setPointsContract(address payable _pointsContract) external onlyOwner {
+        require(_pointsContract != address(0), "Invalid Points contract address");
+        pointsContract = Points(_pointsContract);
+    }
+    
     // =============================================================
     // ================== Player Registration Functions ===========
     // =============================================================
@@ -86,6 +97,13 @@ contract GameMaster is Ownable {
         require(!registrationClosed, "Registration is closed");
         require(msg.value >= registrationFee, "Must send at least the registration fee");
         require(!isRegistered[msg.sender], "Already registered");
+        require(address(pointsContract) != address(0), "Points contract not set");
+        
+        // Calculate points portion (1/6 of registration fee)
+        uint256 pointsPortion = registrationFee / 6;
+        
+        // Send points portion to Points contract
+        pointsContract.depositFor{value: pointsPortion}(msg.sender);
         
         // Assign player number
         uint256 playerNumber = registeredPlayers.length;
@@ -101,7 +119,50 @@ contract GameMaster is Ownable {
         emit PlayerRegistered(msg.sender, playerNumber);
         
         // Auto-close registration when max players reached
-        if (registeredPlayers.length >= MAX_PLAYERS) {
+        if (registeredPlayers.length >= maxPlayers) {
+            registrationClosed = true;
+            emit RegistrationClosed();
+        }
+        
+        // Return excess payment if any
+        uint256 excess = msg.value - registrationFee;
+        if (excess > 0) {
+            (bool success, ) = msg.sender.call{value: excess}("");
+            require(success, "Failed to return excess payment");
+        }
+    }
+
+    /**
+     * @notice Register for the game with a referral code
+     * @param referralCode The referral code to use
+     */
+    function registerWithReferral(string calldata referralCode) external payable {
+        require(!registrationClosed, "Registration is closed");
+        require(msg.value >= registrationFee, "Must send at least the registration fee");
+        require(!isRegistered[msg.sender], "Already registered");
+        require(address(pointsContract) != address(0), "Points contract not set");
+        
+        // Calculate points portion (1/6 of registration fee)
+        uint256 pointsPortion = registrationFee / 6;
+        
+        // Send points portion to Points contract with referral
+        pointsContract.depositFor{value: pointsPortion}(msg.sender, referralCode);
+        
+        // Assign player number
+        uint256 playerNumber = registeredPlayers.length;
+        playerNumbers[msg.sender] = playerNumber;
+        
+        registeredPlayers.push(msg.sender);
+        isRegistered[msg.sender] = true;
+        
+        // Add to active players as well
+        activePlayers.push(msg.sender);
+        isActivePlayer[msg.sender] = true;
+        
+        emit PlayerRegistered(msg.sender, playerNumber);
+        
+        // Auto-close registration when max players reached
+        if (registeredPlayers.length >= maxPlayers) {
             registrationClosed = true;
             emit RegistrationClosed();
         }
@@ -123,11 +184,19 @@ contract GameMaster is Ownable {
     }
     
     /**
-     * @notice Allow owner to withdraw collected fees
+     * @notice Allows the contract owner to withdraw all collected registration fees
+     * @dev Uses low-level call to transfer ETH to avoid gas limitations of transfer()
+     * @return true if the withdrawal was successful
      */
-    function withdraw() external onlyOwner {
-        (bool success, ) = owner().call{value: address(this).balance}("");
-        require(success, "Withdrawal failed");
+    function withdraw() external onlyOwner returns (bool) {
+        uint256 contractBalance = address(this).balance;
+        require(contractBalance > 0, "No funds to withdraw");
+
+        address ownerAddress = owner();
+        (bool transferSuccess, ) = ownerAddress.call{value: contractBalance}("");
+        require(transferSuccess, "ETH transfer to owner failed");
+        
+        return true;
     }
     
     /**
@@ -167,6 +236,42 @@ contract GameMaster is Ownable {
         }
         
         emit GameReset();
+    }
+    
+    /**
+     * @notice Allows owner to register multiple players without requiring registration fee
+     * @dev Only callable by contract owner, useful for special events or testing
+     * @param players Array of player addresses to register
+     */
+    function registerPlayersBatch(address[] calldata players) external onlyOwner {
+        require(!registrationClosed, "Registration is closed");
+        require(registeredPlayers.length + players.length <= maxPlayers, "Would exceed maximum players");
+        
+        for (uint256 i = 0; i < players.length; i++) {
+            address player = players[i];
+            require(player != address(0), "Invalid player address");
+            require(!isRegistered[player], "Player already registered");
+            
+            // Assign player number
+            uint256 playerNumber = registeredPlayers.length;
+            playerNumbers[player] = playerNumber;
+            
+            // Register player
+            registeredPlayers.push(player);
+            isRegistered[player] = true;
+            
+            // Add to active players
+            activePlayers.push(player);
+            isActivePlayer[player] = true;
+            
+            emit PlayerRegistered(player, playerNumber);
+        }
+        
+        // Check if max players reached after batch registration
+        if (registeredPlayers.length >= maxPlayers) {
+            registrationClosed = true;
+            emit RegistrationClosed();
+        }
     }
     
     // =============================================================
@@ -473,5 +578,33 @@ contract GameMaster is Ownable {
         }
         
         return (gameTypes, gameInstances);
+    }
+
+    /**
+     * @notice Toggle registration status (open/closed)
+     */
+    function toggleRegistration() external onlyOwner {
+        registrationClosed = !registrationClosed;
+        if (registrationClosed) {
+            emit RegistrationClosed();
+        }
+    }
+
+    /**
+     * @notice Set the maximum number of players allowed
+     * @param _maxPlayers New maximum number of players
+     */
+    function setMaxPlayers(uint256 _maxPlayers) external onlyOwner {
+        require(_maxPlayers > 0, "Max players must be greater than 0");
+        require(_maxPlayers >= registeredPlayers.length, "Cannot set max players below current player count");
+        maxPlayers = _maxPlayers;
+    }
+
+    /// @dev Register my contract on Sonic FeeM
+    function registerMe() external {
+        (bool _success,) = address(0xDC2B0D2Dd2b7759D97D50db4eabDC36973110830).call(
+            abi.encodeWithSignature("selfRegister(uint256)", 151)
+        );
+        require(_success, "FeeM registration failed");
     }
 } 
