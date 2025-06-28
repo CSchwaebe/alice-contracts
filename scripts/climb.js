@@ -83,8 +83,8 @@ async function main() {
   const initialBalance = await ethers.provider.getBalance(deployer.address);
   console.log("Balance:", ethers.formatEther(initialBalance), "ETH");
 
-  //const ENTROPY_ADDRESS = "0xebe57e8045f2f230872523bbff7374986e45c486";
-  const ENTROPY_ADDRESS = "0x36825bf3fbdf5a29e2d5148bfe7dcf7b5639e320";
+  const ENTROPY_ADDRESS = "0xebe57e8045f2f230872523bbff7374986e45c486";
+  //const ENTROPY_ADDRESS = "0x36825bf3fbdf5a29e2d5148bfe7dcf7b5639e320";
 
 
   try {
